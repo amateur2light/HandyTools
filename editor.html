@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor | HandyTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Override container width for editor to have more space */
+        .container {
+            max-width: 1000px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="app-header" style="margin-top: 2rem; margin-bottom: 2rem;">
+            <a href="index.html" class="home-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Home
+            </a>
+            <h1 style="font-size: 2.5rem;">Text <span class="gradient-text">Editor</span></h1>
+            <p class="subtitle">A distraction-free space for your code snippets.</p>
+        </header>
+
+        <section class="glass-panel editor-container">
+            <div class="find-replace-panel" id="find-replace-panel" style="display: none;">
+                <div class="fr-row">
+                    <div class="fr-input-group">
+                        <input type="text" id="find-input" placeholder="Find">
+                        <div class="fr-toggles">
+                            <button id="toggle-case" class="fr-toggle" title="Match Case">Aa</button>
+                            <button id="toggle-regex" class="fr-toggle" title="Use Regular Expression">.*</button>
+                            <button id="smart-regex-btn" class="fr-toggle" title="Smart Regex from Selection">✨</button>
+                            <button id="context-regex-btn" class="fr-toggle" title="Context Regex (Between)">↔</button>
+                            <button id="ai-regex-btn" class="fr-toggle" title="Prompt to Regex (AI)">🤖</button>
+                        </div>
+                    </div>
+                    <div class="fr-actions">
+                        <button id="find-next-btn" class="fr-btn">Find Next</button>
+                        <button id="find-all-btn" class="fr-btn">Find All</button>
+                    </div>
+                </div>
+                <div class="fr-row">
+                    <div class="fr-input-group">
+                        <input type="text" id="replace-input" placeholder="Replace">
+                    </div>
+                    <div class="fr-actions">
+                        <button id="replace-btn" class="fr-btn">Replace</button>
+                        <button id="replace-all-btn" class="fr-btn">Replace All</button>
+                        <div style="width: 1px; background: var(--glass-border); margin: 0 0.5rem; height: 20px;"></div>
+                        <button id="copy-matches-btn" class="fr-btn" title="Copy all matches to clipboard">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                        <button id="cut-matches-btn" class="fr-btn" title="Cut all matches to clipboard">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                                <path d="M6 9a6 6 0 0 1 12 0"></path>
+                                <line x1="12" y1="15" x2="12" y2="23"></line>
+                                <circle cx="8" cy="21" r="2"></circle>
+                                <circle cx="16" cy="21" r="2"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Panel -->
+            <div class="find-replace-panel" id="tools-panel" style="display: none;">
+                <div class="fr-row" style="justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <div class="fr-actions" style="gap: 0.5rem;">
+                        <span
+                            style="color: var(--text-secondary); font-size: 0.8rem; margin-right: 0.5rem; align-self: center;">Case:</span>
+                        <button id="btn-upper" class="fr-btn" title="Convert to Uppercase">UPPER</button>
+                        <button id="btn-lower" class="fr-btn" title="Convert to Lowercase">lower</button>
+                        <button id="btn-title" class="fr-btn" title="Convert to Title Case">Title Case</button>
+                    </div>
+                    <div style="width: 1px; background: var(--glass-border); height: 20px; align-self: center;"></div>
+                    <div class="fr-actions" style="gap: 0.5rem;">
+                        <span
+                            style="color: var(--text-secondary); font-size: 0.8rem; margin-right: 0.5rem; align-self: center;">Lines:</span>
+                        <button id="btn-sort-asc" class="fr-btn" title="Sort Lines A-Z">Sort A-Z</button>
+                        <button id="btn-sort-desc" class="fr-btn" title="Sort Lines Z-A">Sort Z-A</button>
+                        <button id="btn-dedupe" class="fr-btn" title="Remove Duplicate Lines">No Dupes</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-main">
+                <div class="line-numbers" id="line-numbers">1</div>
+                <div class="code-area-wrapper">
+                    <pre id="code-overlay" class="editor-content-layer" aria-hidden="true"></pre>
+                    <textarea id="code-editor" class="editor-content-layer" spellcheck="false"
+                        placeholder="Start typing..."></textarea>
+                </div>
+            </div>
+
+            <!-- Regex Wizard Overlay -->
+            <div id="regex-wizard" class="glass-panel" style="display: none;">
+                <div class="wizard-header">
+                    <h4>Regex Wizard</h4>
+                    <span id="wizard-step-indicator">Step 1 of 3</span>
+                </div>
+                <p id="wizard-instruction" class="wizard-instruction">Highlight the <strong>Left Context</strong>
+                    (Prefix)</p>
+                <div class="wizard-actions">
+                    <button id="wizard-cancel-btn" class="secondary-btn">Cancel</button>
+                    <button id="wizard-confirm-btn" class="primary-btn"
+                        style="width: auto; padding: 0.5rem 1rem;">Confirm Selection</button>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-item">
+                    <span id="cursor-pos">Ln 1, Col 1</span>
+                </div>
+                <div class="status-item" style="gap: 0.5rem;">
+                    <button id="undo-btn" class="secondary-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"
+                        title="Undo (Ctrl+Z)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7v6h6"></path>
+                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                        </svg>
+                    </button>
+                    <button id="redo-btn" class="secondary-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"
+                        title="Redo (Ctrl+Y)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 7v6h-6"></path>
+                            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l2.7 2.7"></path>
+                        </svg>
+                    </button>
+                    <div style="width: 1px; background: var(--glass-border); margin: 0 0.2rem;"></div>
+                    <button id="toggle-wrap-btn" class="secondary-btn"
+                        style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" title="Toggle Word Wrap">
+                        Wrap
+                    </button>
+                    <button id="toggle-fullscreen-btn" class="secondary-btn"
+                        style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" title="Toggle Full Screen">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button id="toggle-find-btn" class="secondary-btn"
+                        style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" title="Find & Replace (Ctrl+F)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        Find
+                    </button>
+                    <button id="toggle-tools-btn" class="secondary-btn"
+                        style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" title="Text Tools">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
+                            </path>
+                        </svg>
+                        Tools
+                    </button>
+                    <span id="char-count">0 chars</span>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <script src="editor.js"></script>
+</body>
+
+</html>

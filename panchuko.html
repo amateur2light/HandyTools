@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panchuko | Shared Text</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .panchuko-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: calc(100vh - 120px);
+        }
+
+        .path-control {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .path-input-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .path-prefix {
+            color: rgba(255, 255, 255, 0.5);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .path-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            width: 100%;
+            outline: none;
+            font-family: monospace;
+        }
+
+        .path-input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-area {
+            flex: 1;
+            background: #1e1e1e;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-textarea {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .status-bar {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .status-msg {
+            transition: color 0.3s;
+        }
+
+        .status-msg.success {
+            color: #4ade80;
+        }
+
+        .status-msg.error {
+            color: #f87171;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="app-header">
+        <a href="index.html" class="home-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Home
+        </a>
+        <h1>Panchuko <span class="gradient-text">Share</span></h1>
+    </header>
+
+    <main class="panchuko-container">
+        <div class="path-control">
+            <div class="path-input-group">
+                <span class="path-prefix">/share/</span>
+                <input type="text" id="pathInput" class="path-input" placeholder="enter-path-name" autocomplete="off"
+                    spellcheck="false">
+            </div>
+            <button id="lockBtn" class="lock-btn" disabled title="Set Password">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </button>
+            <button id="enableNotifyBtn" class="lock-btn" style="display: none;" title="Enable Desktop Notifications">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                </svg>
+            </button>
+            <button id="notifyBtn" class="notify-btn" disabled title="Notify active users">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </button>
+            <button id="saveBtn" class="save-btn" disabled>Save Content</button>
+        </div>
+
+        <div class="editor-area">
+            <div id="lockOverlay" class="lock-overlay" style="display: none;">
+                <div class="lock-msg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-bottom: 1rem; opacity: 0.5;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <h3>This file is locked</h3>
+                    <button id="unlockBtn" class="save-btn" style="margin-top: 1rem;">Unlock</button>
+                </div>
+            </div>
+            <textarea id="contentArea" class="content-textarea"
+                placeholder="Start typing... Content is shared on the specified path." spellcheck="false"></textarea>
+            <div class="status-bar">
+                <span id="charCount">0 characters</span>
+                <span id="statusMsg" class="status-msg">Ready</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Password Modal -->
+    <div id="passModal" class="modal-backdrop" style="display: none;">
+        <div class="modal">
+            <h3 id="modalTitle">Enter Password</h3>
+            <p id="modalDesc" style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 1rem;">Use a
+                password to protect this path.</p>
+            <input type="password" id="modalInput" class="modal-input" placeholder="Password">
+            <div class="modal-actions">
+                <button id="modalCancel" class="modal-btn secondary">Cancel</button>
+                <button id="modalConfirm" class="modal-btn primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .lock-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.6rem;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lock-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .lock-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .lock-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding-bottom: 30px;
+            /* status bar height */
+            background: rgba(30, 30, 30, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .lock-msg {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: #252525;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: #6366f1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal-btn.secondary:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-btn.primary {
+            background: #6366f1;
+            color: #fff;
+        }
+
+        .modal-btn.primary:hover {
+            background: #4f46e5;
+        }
+    </style>
+
+    <script src="panchuko.js?v=5"></script>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+</body>
+
+</html>

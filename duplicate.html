@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate Line Counter | Tool Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tool-specific overrides */
+        .duplicate-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .duplicate-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .duplicate-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .duplicate-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            vertical-align: top;
+        }
+
+        .duplicate-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .count-badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .line-content-cell {
+            font-family: 'Consolas', monospace;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            max-width: 500px;
+        }
+
+        .locations-cell {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="app-header">
+            <a href="index.html" class="home-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Home
+            </a>
+
+            <h1>Duplicate <span class="gradient-text">Counter</span></h1>
+            <p class="subtitle">Find duplicated lines across your files.</p>
+        </header>
+
+        <section class="search-panel glass-panel">
+            <div class="input-group">
+                <label for="text-input">Paste Text Content</label>
+                <div class="search-box-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="search-icon">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <textarea id="text-input" rows="5" placeholder="Paste text here to check for duplicate lines..."
+                        autocomplete="off" style="min-height: 120px;"></textarea>
+                </div>
+            </div>
+
+            <div class="upload-area" id="drop-zone">
+                <input type="file" id="file-input" multiple accept=".txt,.md,.js,.html,.css,.json,.csv,.log,.xml">
+                <div class="upload-content">
+                    <div class="cloud-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21.2 15c.7 0 1.3-.6 1.3-1.3 0-.6-.6-1.2-1.3-1.2h-3v-2c0-1.7-1.3-3-3-3h-2v-2c0-1.7-1.3-3-3-3-1.7 0-3 1.3-3 3v2H6c-1.7 0-3 1.3-3 3v2h-.8C1.5 12.5.8 13.2.8 14c0 .7.6 1.3 1.3 1.3H4v2c0 1.7 1.3 3 3 3h10c1.7 0 3-1.3 3-3v-2h1.2z" />
+                        </svg>
+                    </div>
+                    <p class="upload-text">Drag & drop files here or <span class="highlight">browse</span></p>
+                    <div id="file-list-preview" class="file-list-preview"></div>
+                </div>
+            </div>
+
+            <button id="find-btn" class="primary-btn">
+                <span class="btn-text">Find Duplicates</span>
+            </button>
+        </section>
+
+        <section id="results-area" class="results-area">
+            <div id="results-header" class="results-header" style="display: none;">
+                <h2>Results</h2>
+                <div class="header-actions">
+                    <button id="copy-lines-btn" class="secondary-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Copy Lines
+                    </button>
+                    <button id="copy-report-btn" class="secondary-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy Report
+                    </button>
+                    <button id="export-btn" class="secondary-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export Report
+                    </button>
+                </div>
+            </div>
+            <div id="results-list"></div>
+        </section>
+    </main>
+
+    <script src="duplicate.js"></script>
+</body>
+
+</html>
