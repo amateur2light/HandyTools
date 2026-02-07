@@ -1,6 +1,6 @@
 # HandyTools 🛠️
 
-![HandyTools Logo](handytools_logo.png)
+
 
 > A suite of powerful, client-side utilities for your daily handy tasks. Run it locally, use it instantly.
 
